@@ -17,17 +17,29 @@
                 },
             };
 
+            function array_from_vec(v) {
+                var a = [];
+                for (var i = 0; i < v.size(); i++) {
+                    a.push(v.get(i));
+                }
+                return a;
+            }
+
             function draw() {
                 console.log("draw() called");
                 const canvas = document.getElementById("canvas");
                 if (canvas.getContext) {
                     const ctx = canvas.getContext("2d");
                     ctx.fillStyle = "rgb(200, 0, 0)";
-                    let width = 30;
-                    let height = 50;
-                    let area = Module.rectangle_area(width, height);
-                    console.log("Drawing rectangle with area: " + area + "px^2");
-                    ctx.fillRect(20, 30, width, height);
+
+                    let rectangle = new Module.Rectangle(20, 30, 30, 50);
+                    let dimensions = array_from_vec(rectangle.dimensions());
+
+                    console.log("dimensions: " + dimensions);
+                    ctx.fillRect(...dimensions);
+
+                    // C++ objects _must_ be deleted manually?!
+                    rectangle.delete();
                 } else {
                     console.log("canvas not supported");
                 }
