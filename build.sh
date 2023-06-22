@@ -11,4 +11,4 @@ docker run \
     --user "$(id -u):$(id -g)" \
     --workdir "$PWD" \
     emscripten/emsdk:latest \
-    emcc -lembind rectangle.cpp -o rectangle.js
+    bash -c "emcmake cmake -B ./build/ -DCMAKE_EXPORT_COMPILE_COMMANDS=ON . && cmake --build ./build/"

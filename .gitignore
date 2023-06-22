@@ -1,2 +1,2 @@
-rectangle.js
 *.wasm
+build/
