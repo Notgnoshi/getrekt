@@ -3,9 +3,31 @@
     <head>
         <meta charset="utf-8" />
         <title>getrekt</title>
+        <style>
+            canvas {
+                border: 1px solid black;
+            }
+        </style>
+        <script language="javascript">
+            function draw() {
+                console.log("draw() called");
+                const canvas = document.getElementById("canvas");
+                if (canvas.getContext) {
+                    const ctx = canvas.getContext("2d");
+                    ctx.fillStyle = "rgb(200, 0, 0)";
+                    ctx.fillRect(20, 30, 30, 50);
+                } else {
+                    console.log("canvas not supported");
+                }
+            }
+        </script>
+        <script src="hello-world.js"></script>
     </head>
-    <body>
+    <body onload="draw();">
         <p>hello world?</p>
+        <!-- </canvas> closing tag is required, but prettier doesn't like it ... -->
+        <canvas id="canvas" width="1000" height"1000" />
+        <!-- not having a closing tag treats the rest of the document as fallback content -->
+        <p>fallback?</p>
     </body>
-    <script src="hello-world.js"></script>
 </html>
