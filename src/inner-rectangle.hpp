@@ -14,6 +14,7 @@ class InnerRectangle
 
   private:
     friend class Rectangle;
+    friend class Rectinator;
 
     int m_min_x;
     int m_min_y;

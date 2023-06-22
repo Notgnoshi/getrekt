@@ -15,6 +15,7 @@ EMSCRIPTEN_BINDINGS(rectinator)
 {
     emscripten::class_<Rectinator>("Rectinator")
         .constructor<int, int>()
-        .function("create", &Rectinator::create);
+        .function("create", &Rectinator::create)
+        .function("select", &Rectinator::select);
 };
 }  // namespace getrekt

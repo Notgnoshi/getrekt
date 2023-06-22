@@ -8,6 +8,7 @@ var Module = {
     onRuntimeInitialized: init,
     canvas: null,
     rectinator: null,
+    rectangles: [],
 };
 
 function init() {
@@ -29,16 +30,33 @@ function init() {
         let max_x = Math.max(g_start_x, end_x);
         let max_y = Math.max(g_start_y, end_y);
 
-        let rectangle = Module.rectinator.create(min_x, min_y, max_x, max_y);
-        draw_rectangle(rectangle);
+        let width = max_x - min_x;
+        let height = max_y - min_y;
+
+        if (width < 3 && height < 3) {
+            let rectangle = Module.rectinator.select(end_x, end_y);
+            if (rectangle) {
+                console.log("Selected rectangle!");
+                let selected = "green";
+                let deselected = "red";
+                for (const rect of Module.rectangles) {
+                    draw_rectangle(rect, deselected);
+                }
+                draw_rectangle(rectangle, selected);
+            }
+        } else {
+            let rectangle = Module.rectinator.create(min_x, min_y, max_x, max_y);
+            Module.rectangles.push(rectangle);
+            let color = "red";
+            draw_rectangle(rectangle, color);
+        }
     };
 }
 
-function draw_rectangle(rect) {
+function draw_rectangle(rect, color) {
     const ctx = Module.canvas.getContext("2d");
-    ctx.fillStyle = "rgb(200, 0, 0)";
+    ctx.fillStyle = color;
     let dimensions = array_from_vec(rect.dimensions());
-    console.log("Drawing dimensions: " + dimensions);
     ctx.fillRect(...dimensions);
 }
 

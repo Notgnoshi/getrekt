@@ -22,4 +22,17 @@ Rectangle Rectinator::create(int min_x, int min_y, int max_x, int max_y) noexcep
 
     return handle;
 }
+
+std::unique_ptr<Rectangle> Rectinator::select(int x, int y) const noexcept
+{
+    for (const auto& rect : m_rectangles)
+    {
+        if (rect->m_min_x <= x && x <= rect->m_max_x && rect->m_min_y <= y && y <= rect->m_max_y)
+        {
+            // std::make_unique can't access the private Rectangle constructor?!
+            return std::unique_ptr<Rectangle>(new Rectangle(rect));
+        }
+    }
+    return nullptr;
+}
 }  // namespace getrekt
