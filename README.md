@@ -9,3 +9,9 @@ $ ./nginx.sh
 $ curl http://localhost:8080
 Hello world.
 ```
+
+## How to build
+
+```sh
+$ ./build.sh
+```
