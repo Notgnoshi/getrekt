@@ -11,4 +11,4 @@ docker run \
     --user "$(id -u):$(id -g)" \
     --workdir "$PWD" \
     emscripten/emsdk:latest \
-    emcc -lembind hello-world.cpp -o hello-world.js
+    emcc -lembind rectangle.cpp -o rectangle.js
