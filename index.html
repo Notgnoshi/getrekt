@@ -1,45 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>getrekt</title>
-        <style>
-            canvas {
-                border: 1px solid black;
-            }
-        </style>
-        <script language="javascript">
-            var Module = {
-                // The WASM Module stuffs aren't available immediately because there's considerable
-                // initialization to load WASM.
-                onRuntimeInitialized: function () {
-                    draw();
-                },
-            };
+<head>
+    <meta charset="utf-8" />
+    <title>getrekt</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+    <script language="javascript">
+        var Module = {
+            // The WASM Module stuffs aren't available immediately because there's considerable
+            // initialization to load WASM.
+            onRuntimeInitialized: function () {
+                SharedPtrTest();
+                // BackForthTest();
+                // IteratorTest();
+            },
+        };
 
-            function draw() {
-                console.log("draw() called");
-                const canvas = document.getElementById("canvas");
-                if (canvas.getContext) {
-                    const ctx = canvas.getContext("2d");
+        function SharedPtrTest() {   
+            console.log("SharedPtrTest() called");
+            const canvas = document.getElementById("canvas");
+            if (canvas.getContext) {
+
+                const ctx = canvas.getContext("2d");
                     ctx.fillStyle = "rgb(200, 0, 0)";
-                    let width = 30;
+                    let width = 60;
                     let height = 50;
                     let area = Module.rectangle_area(width, height);
                     console.log("Drawing rectangle with area: " + area + "px^2");
                     ctx.fillRect(20, 30, width, height);
-                } else {
-                    console.log("canvas not supported");
+
+                // Create an testClassSharedPtr of testClass
+                var testClassSharedPtr = new Module.TestClassSharedPtr();
+
+                // Push values into the vector
+                testClassSharedPtr.pushBack(100);
+                testClassSharedPtr.pushBack(200);
+                testClassSharedPtr.pushBack(300);
+
+                // Get the size of the vector
+                const size = testClassSharedPtr.getSize();
+                console.log("Vector Size:", size);
+
+                // Retrieve values from the vector and draw rectangles
+                let x = 100;
+                let y = 100;
+                for (let i = 0; i < size; i++) {
+                    const value = testClassSharedPtr.getValueAtIndex(i);
+                    console.log("Value at index", i, ":", value);
+
+                    let width = value;
+                    let height = value;
+                    let area = Module.rectangle_area(width, height);
+                    console.log("Drawing rectangle with area:", area, "px^2");
+                    ctx.fillRect(x, y, width, height);
+                    x += width + 10; // spacing between rectangles
                 }
+
+                const result = testClassSharedPtr.getValueAtIndexwithPtr(testClassSharedPtr, 1);
+                console.log("Returned vector at index", result);
+
+                // No need to delete if it is a smart pointer
+                // testClassSharedPtr.delete();
+            } else {
+                console.log("canvas not supported");
             }
-        </script>
-        <script src="rectangle.js"></script>
-    </head>
-    <body>
-        <p>hello world?</p>
-        <!-- </canvas> closing tag is required, but prettier doesn't like it ... -->
-        <canvas id="canvas" width="1000" height"1000" />
-        <!-- not having a closing tag treats the rest of the document as fallback content -->
-        <p>fallback?</p>
-    </body>
+        }
+
+        function BackForthTest(){
+            console.log("BackForthTest called");
+
+            var newJSObject = new Module.TestClassBackForth();
+
+            var returnPointer = Module.passThrough(newJSObject);
+
+            console.log("Passing pointer to function success");
+
+            // This Fails
+            // var returnObject = Module.passThroughObject(newJSObject);
+            // console.log("Passing object to function success");
+
+            returnPointer.set_integer(5);
+            newJSObject.set_integer(10);
+
+
+            console.log("value after round trip pointer to pointer", returnPointer.get_integer(returnPointer));
+
+            console.log("value after round trip pointer to pointer using orignial object", newJSObject.get_integer(returnPointer));
+
+            returnPointer.delete();
+            //  or 
+            // newJSObject.delete();
+
+        }
+
+        function IteratorTest() {
+            console.log("IteratorTest called");
+
+            // Create an instance of TestClassVecIterator
+            const myClass = new Module.TestClassVecIterator();
+            console.log("object created");
+
+            // Push some values to the vector
+            myClass.pushBack(1);
+            myClass.pushBack(2);
+            myClass.pushBack(3);
+
+            console.log("Vector pushback success");
+
+            // Access the vector elements using the iterators
+            var beginIterator = new Module.doubleVectorIterator();
+            var endIterator = new Module.doubleVectorIterator();
+            var cbeginIterator = new Module.constDoubleVectorIterator();
+            var cendIterator = new Module.constDoubleVectorIterator();
+
+            beginIterator = myClass.begin();
+            endIterator = myClass.end();
+
+            console.log("size of vector", myClass.size());
+
+            console.log("begin value", beginIterator.get_value());
+
+            console.log("end value", endIterator.get_value());
+
+            cbeginIterator = myClass.cbegin();
+            cendIterator = myClass.cend();
+
+            console.log("Using begin() and end() iterators:");
+            var sum = myClass.sum();
+            console.log("Sum of vector elements:", sum);
+            console.log("First elements:", myClass.getValueForIterator(beginIterator));
+            console.log("Third elements:", myClass.getValueForIterator(endIterator));
+
+            console.log("Using cbegin() and cend() iterators:");
+            sum = myClass.sum();
+            console.log("Sum of vector elements:", sum);
+        
+
+            beginIterator.delete();
+            endIterator.delete();
+            cbeginIterator.delete();
+            cendIterator.delete();
+            myClass.delete();
+            }
+
+
+        function passThrough(ptr) {
+            return Module.passThrough(ptr);
+        }
+    </script>
+    <script src="rectangle.js"></script>
+</head>
+<body>
+    <p>hello world?</p>
+    <canvas id="canvas" width="1000" height="1000"></canvas>
+    <p>fallback?</p>
+</body>
 </html>
